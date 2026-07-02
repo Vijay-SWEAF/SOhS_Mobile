@@ -35,3 +35,57 @@ button:focus-visible {
   outline-offset: 3px;
   border-radius: 999px;
 }
+
+/* reveal choreography keyframes (ported from the prototype) */
+@keyframes heartbeat {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.28);
+  }
+}
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ringPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(228, 185, 104, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 24px rgba(228, 185, 104, 0);
+  }
+}
+@keyframes driftGlow {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate(-50%, 0);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate(-50%, -8px);
+  }
+}
+
+.owq-chips::-webkit-scrollbar {
+  display: none;
+}
