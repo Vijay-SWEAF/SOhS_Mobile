@@ -1,4 +1,24 @@
-import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
+import { registerPlugin } from "@capacitor/core";
+
+enum ImpactStyle {
+  Medium = "MEDIUM",
+}
+
+enum NotificationType {
+  Success = "SUCCESS",
+}
+
+interface HapticsPlugin {
+  impact(options: { style: ImpactStyle }): Promise<void>;
+  notification(options: { type: NotificationType }): Promise<void>;
+}
+
+const Haptics = registerPlugin<HapticsPlugin>("Haptics", {
+  web: {
+    impact: async () => {},
+    notification: async () => {},
+  },
+});
 
 /* Fire-and-forget wrappers — haptics must never break the flow. */
 
