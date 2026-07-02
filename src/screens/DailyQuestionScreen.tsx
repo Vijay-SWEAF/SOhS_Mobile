@@ -2,9 +2,11 @@ import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react"
 import BrandBar from "../components/BrandBar";
 import ThinkPanel from "../components/ThinkPanel";
 import ShareCardOverlay from "../components/ShareCardOverlay";
-import { QUESTIONS, fmt, type OptionIndex } from "../lib/questions";
+import { fmt, type OptionIndex } from "../lib/questions";
 import { revealHaptic, tapHaptic } from "../lib/haptics";
 import { useReducedMotion } from "../lib/useReducedMotion";
+import { getDeviceId, getStoredVote, storeVote } from "../lib/device";
+import { castVote, detectCountryCode, loadActiveQuestion, type LiveDailyQuestion } from "../lib/appQuestions";
 import {
   FAINT,
   FONT_SERIF,
@@ -24,10 +26,12 @@ const Globe = lazy(() => import("../components/Globe"));
 type Stage = "question" | "tapped" | "unlocking" | "reveal";
 
 export default function DailyQuestionScreen() {
-  const [qIndex, setQIndex] = useState(0);
+  const [question, setQuestion] = useState<LiveDailyQuestion | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [stage, setStage] = useState<Stage>("question");
   const [choice, setChoice] = useState<OptionIndex | null>(null);
-  const [counter, setCounter] = useState(2_841_902);
+  const [counter, setCounter] = useState(0);
   const [rollA, setRollA] = useState(0);
   const [rollB, setRollB] = useState(0);
   const [barOn, setBarOn] = useState(false);
@@ -35,14 +39,16 @@ export default function DailyQuestionScreen() {
   const [showThink, setShowThink] = useState(false);
   const [showFooter, setShowFooter] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [voteNotice, setVoteNotice] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const timers = useRef<number[]>([]);
   const rafRef = useRef<number | null>(null);
   const reduceMotion = useReducedMotion();
 
-  const q = QUESTIONS[qIndex % QUESTIONS.length] ?? QUESTIONS[0]!;
-  const chosen = choice !== null ? q.options[choice] : null;
-  const other = choice !== null ? q.options[choice === 0 ? 1 : 0] : null;
+  const q = question;
+  const chosen = q && choice !== null ? q.options[choice] : null;
+  const other = q && choice !== null ? q.options[choice === 0 ? 1 : 0] : null;
   const isMajority = chosen !== null && other !== null && chosen.pct >= other.pct;
   const accent = isMajority ? GOLD : TEAL;
   const accentDeep = isMajority ? GOLD_DEEP : TEAL_DEEP;
@@ -52,15 +58,47 @@ export default function DailyQuestionScreen() {
     timers.current.push(id);
   }, []);
 
-  /* live "people have answered" ticker while the question is open */
   useEffect(() => {
-    if (stage !== "question") return;
-    const id = window.setInterval(
-      () => setCounter((c) => c + 1 + Math.floor(Math.random() * 12)),
-      190,
-    );
-    return () => window.clearInterval(id);
-  }, [stage]);
+    let cancelled = false;
+
+    async function loadQuestion(): Promise<void> {
+      try {
+        setLoading(true);
+        setError(null);
+        const activeQuestion = await loadActiveQuestion();
+        const storedChoice = await getStoredVote(activeQuestion.id);
+        if (cancelled) return;
+
+        setQuestion(activeQuestion);
+        setCounter(activeQuestion.totalVotes);
+        if (storedChoice !== null) {
+          setChoice(storedChoice);
+          setStage("reveal");
+          setRollA(activeQuestion.options[0].pct);
+          setRollB(activeQuestion.options[1].pct);
+          setBarOn(true);
+          setShowGlobe(true);
+          setShowThink(true);
+          setShowFooter(true);
+          setVoteNotice("Your vote is already counted.");
+        }
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Unable to load today's question.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void loadQuestion();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!q) return;
+    setCounter(q.totalVotes);
+  }, [q]);
 
   useEffect(
     () => () => {
@@ -72,7 +110,7 @@ export default function DailyQuestionScreen() {
 
   /* count-up of both percentages on reveal */
   useEffect(() => {
-    if (stage !== "reveal" || choice === null) return;
+    if (stage !== "reveal" || choice === null || !q) return;
     const dur = reduceMotion ? 350 : 1300;
     const start = performance.now();
     const a = q.options[0].pct;
@@ -92,11 +130,7 @@ export default function DailyQuestionScreen() {
 
   const speed = reduceMotion ? 0.35 : 1;
 
-  const answer = (idx: OptionIndex): void => {
-    if (stage !== "question") return;
-    setChoice(idx);
-    setStage("tapped");
-    tapHaptic();
+  const reveal = useCallback((): void => {
     later(() => setStage("unlocking"), 680 * speed);
     later(() => {
       setStage("reveal");
@@ -106,24 +140,52 @@ export default function DailyQuestionScreen() {
     later(() => setShowGlobe(true), (680 + 1150 + 700) * speed);
     later(() => setShowThink(true), (680 + 1150 + 1500) * speed);
     later(() => setShowFooter(true), (680 + 1150 + 2300) * speed);
+  }, [later, speed]);
+
+  const answer = async (idx: OptionIndex): Promise<void> => {
+    if (stage !== "question" || !q || submitting) return;
+
+    setChoice(idx);
+    setStage("tapped");
+    setSubmitting(true);
+    setVoteNotice(null);
+    setError(null);
+    tapHaptic();
+
+    try {
+      const deviceId = await getDeviceId();
+      const result = await castVote(q, deviceId, idx, detectCountryCode());
+      await storeVote(q.id, idx);
+      setQuestion(result.question);
+      setCounter(result.question.totalVotes);
+      setVoteNotice(result.alreadyVoted ? "Your vote was already counted." : "Your vote is counted.");
+      reveal();
+    } catch (err) {
+      setChoice(null);
+      setStage("question");
+      setError(err instanceof Error ? err.message : "Unable to submit your vote.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  /* Phase 2 demo affordance — replaced by the locked countdown in Phase 4 */
-  const nextQuestion = (): void => {
-    timers.current.forEach((id) => window.clearTimeout(id));
-    timers.current = [];
-    setQIndex((i) => (i + 1) % QUESTIONS.length);
-    setChoice(null);
-    setRollA(0);
-    setRollB(0);
-    setBarOn(false);
-    setShowGlobe(false);
-    setShowThink(false);
-    setShowFooter(false);
-    setShareOpen(false);
-    setCounter(1_500_000 + Math.floor(Math.random() * 2_000_000));
-    setStage("question");
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-ink font-sans px-8">
+        <p style={{ color: MUTED, fontSize: 12.5, letterSpacing: "0.22em" }}>LOADING TODAY'S QUESTION…</p>
+      </div>
+    );
+  }
+
+  if (!q) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-ink font-sans px-8 text-center">
+        <p style={{ color: MUTED, fontSize: 14, lineHeight: 1.5 }}>
+          {error ?? "Today's question is not available yet."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full flex justify-center bg-ink font-sans">
@@ -186,6 +248,11 @@ export default function DailyQuestionScreen() {
             >
               {q.context}
             </p>
+            {error && (
+              <p className="text-center mt-4" style={{ color: TEAL, fontSize: 12.5, lineHeight: 1.45 }}>
+                {error}
+              </p>
+            )}
 
             <div className="flex flex-col gap-3.5 mt-11">
               {q.options.map((opt, i) => {
@@ -196,6 +263,7 @@ export default function DailyQuestionScreen() {
                   <button
                     key={opt.label}
                     onClick={() => answer(idx)}
+                    disabled={stage !== "question" || submitting}
                     className="w-full py-4 rounded-2xl"
                     style={{
                       fontSize: 16.5,
@@ -210,10 +278,10 @@ export default function DailyQuestionScreen() {
                       transform: picked ? "scale(1.03)" : "scale(1)",
                       transition: "all .5s cubic-bezier(.2,.8,.2,1)",
                       animation: picked ? "ringPulse .7s ease-out" : "none",
-                      cursor: stage === "question" ? "pointer" : "default",
+                      cursor: stage === "question" && !submitting ? "pointer" : "default",
                     }}
                   >
-                    {opt.label}
+                    {picked && submitting ? "Counting…" : opt.label}
                   </button>
                 );
               })}
@@ -247,7 +315,7 @@ export default function DailyQuestionScreen() {
               }}
             />
             <p style={{ color: MUTED, fontSize: 12.5, letterSpacing: "0.22em" }}>
-              LISTENING TO THE WORLD…
+              COUNTING YOUR VOTE…
             </p>
           </div>
         )}
@@ -346,8 +414,13 @@ export default function DailyQuestionScreen() {
                   : `A rarer view — ${chosen.pct}% of humanity`}
               </span>
             </div>
+            {voteNotice && (
+              <p className="text-center mt-3" style={{ color: MUTED, fontSize: 12.5 }}>
+                {voteNotice}
+              </p>
+            )}
 
-            {showGlobe && (
+            {showGlobe && q.chips.length > 0 && (
               <div className="mt-3" style={{ animation: "fadeIn .8s ease both" }}>
                 <Suspense fallback={<div style={{ height: 240 }} />}>
                   <Globe reduceMotion={reduceMotion} />
@@ -422,9 +495,8 @@ export default function DailyQuestionScreen() {
                   >
                     Share your answer
                   </button>
-                  <button
-                    onClick={nextQuestion}
-                    className="w-full py-3.5 rounded-2xl"
+                  <div
+                    className="w-full py-3.5 rounded-2xl text-center"
                     style={{
                       fontSize: 14,
                       fontWeight: 500,
@@ -433,9 +505,8 @@ export default function DailyQuestionScreen() {
                       border: `1px solid ${HAIRLINE}`,
                     }}
                   >
-                    Next question ↺ &nbsp;
-                    <span style={{ color: FAINT, fontSize: 12 }}>demo</span>
-                  </button>
+                    Next question unlocks tomorrow
+                  </div>
                 </div>
               </div>
             )}
