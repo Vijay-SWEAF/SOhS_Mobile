@@ -1,0 +1,18 @@
+/* Bundled locally — no CDN at runtime.
+   Variable fonts, latin subset, weights 400–600 (all the app uses). */
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("./fraunces-var-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("./inter-var-latin.woff2") format("woff2");
+}
