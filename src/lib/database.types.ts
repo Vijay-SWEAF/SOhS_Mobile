@@ -155,6 +155,42 @@ export type Database = {
           },
         ];
       };
+      human_questions: {
+        Row: {
+          id: string;
+          title: string;
+          slug: string;
+          summary: string;
+          status: "draft" | "published" | "archived";
+          featured_status: "open" | "featured" | "closed";
+          published_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          slug: string;
+          summary: string;
+          status?: "draft" | "published" | "archived";
+          featured_status?: "open" | "featured" | "closed";
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          slug?: string;
+          summary?: string;
+          status?: "draft" | "published" | "archived";
+          featured_status?: "open" | "featured" | "closed";
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

@@ -1,15 +1,23 @@
 import type { Database, Json } from "./database.types";
+import { questionDiscussionUrl } from "./discussionBridge";
 import type { CountryChip, DailyQuestion, OptionIndex, QuestionOption, ThinkContent } from "./questions";
 import { supabase } from "./supabase";
 
 type AppDailyQuestionRow = Database["public"]["Tables"]["app_daily_questions"]["Row"];
 type AppVoteCountsRow = Database["public"]["Tables"]["app_vote_counts"]["Row"];
 type AppCountryCountsRow = Database["public"]["Tables"]["app_vote_country_counts"]["Row"];
+type WebsiteQuestionRow = Pick<Database["public"]["Tables"]["human_questions"]["Row"], "id" | "slug" | "status">;
+
+type AppDailyQuestionWithLink = AppDailyQuestionRow & {
+  linked_question?: WebsiteQuestionRow | null;
+  discussionUrl?: string | null;
+};
 
 export interface LiveDailyQuestion extends DailyQuestion {
   id: string;
   questionId: string | null;
   activeDate: string;
+  discussionUrl: string | null;
   totalVotes: number;
 }
 
@@ -100,8 +108,15 @@ function buildChips(
     .map(({ flag, name, line }) => ({ flag, name, line }));
 }
 
+function discussionUrlForRow(row: AppDailyQuestionWithLink): string | null {
+  if (row.discussionUrl !== undefined) return row.discussionUrl;
+  if (!row.linked_question || row.linked_question.status !== "published") return null;
+
+  return questionDiscussionUrl(row.linked_question.slug);
+}
+
 function toQuestion(
-  row: AppDailyQuestionRow,
+  row: AppDailyQuestionWithLink,
   counts: AppVoteCountsRow | null,
   countryRows: readonly AppCountryCountsRow[],
 ): LiveDailyQuestion {
@@ -110,6 +125,7 @@ function toQuestion(
     id: row.id,
     questionId: row.question_id,
     activeDate: row.active_date,
+    discussionUrl: discussionUrlForRow(row),
     day: row.day_number,
     kind: row.kind,
     text: row.question_text,
@@ -146,7 +162,7 @@ async function fetchCountryCounts(questionId: string): Promise<AppCountryCountsR
 export async function loadActiveQuestion(): Promise<LiveDailyQuestion> {
   const { data, error } = await supabase
     .from("app_daily_questions")
-    .select("*")
+    .select("*, linked_question:human_questions(id, slug, status)")
     .lte("active_date", utcDateString())
     .order("active_date", { ascending: false })
     .limit(1)
@@ -210,6 +226,7 @@ export async function castVote(
         id: question.id,
         question_id: question.questionId,
         active_date: question.activeDate,
+        discussionUrl: question.discussionUrl,
         day_number: question.day,
         kind: question.kind,
         question_text: question.text,

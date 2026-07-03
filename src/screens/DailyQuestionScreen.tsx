@@ -448,7 +448,7 @@ export default function DailyQuestionScreen() {
               </div>
             )}
 
-            {showThink && <ThinkPanel think={q.think} />}
+            {showThink && <ThinkPanel think={q.think} discussionUrl={q.discussionUrl} />}
 
             {/* twist */}
             {showThink && (

@@ -1,5 +1,6 @@
 import { GOLD, HAIRLINE, MUTED, PAPER, TEAL } from "../lib/theme";
 import type { ThinkContent } from "../lib/questions";
+import { openDiscussion } from "../lib/discussionBridge";
 
 /* Signature panel: "How to think about this" — fact / opinion / watch-for. */
 
@@ -25,9 +26,15 @@ function Row({ tag, tagColor, text }: RowProps) {
 
 interface ThinkPanelProps {
   think: ThinkContent;
+  discussionUrl: string | null;
 }
 
-export default function ThinkPanel({ think }: ThinkPanelProps) {
+export default function ThinkPanel({ think, discussionUrl }: ThinkPanelProps) {
+  const openLinkedDiscussion = (): void => {
+    if (!discussionUrl) return;
+    void openDiscussion(discussionUrl);
+  };
+
   return (
     <div
       className="mt-5 rounded-2xl overflow-hidden"
@@ -53,9 +60,20 @@ export default function ThinkPanel({ think }: ThinkPanelProps) {
         className="px-5 py-3.5"
         style={{ borderTop: `1px solid ${HAIRLINE}`, background: "rgba(255,255,255,0.02)" }}
       >
-        <span style={{ fontSize: 12, color: MUTED }}>
-          Read the full discussion on <span style={{ color: GOLD, fontWeight: 500 }}>SOhS →</span>
-        </span>
+        {discussionUrl ? (
+          <button
+            type="button"
+            onClick={openLinkedDiscussion}
+            className="w-full text-left"
+            style={{ fontSize: 12, color: MUTED }}
+          >
+            Read the full discussion on <span style={{ color: GOLD, fontWeight: 500 }}>SOhS →</span>
+          </button>
+        ) : (
+          <span style={{ fontSize: 12, color: MUTED }}>
+            Website discussion <span style={{ color: GOLD, fontWeight: 500 }}>coming soon</span>
+          </span>
+        )}
       </div>
     </div>
   );
