@@ -18,6 +18,7 @@ export type Database = {
           kind: string;
           question_text: string;
           context: string | null;
+          discussion_path: string | null;
           options: Json;
           think: Json;
           twist: string | null;
@@ -32,6 +33,7 @@ export type Database = {
           kind?: string;
           question_text: string;
           context?: string | null;
+          discussion_path?: string | null;
           options: Json;
           think: Json;
           twist?: string | null;
@@ -46,6 +48,7 @@ export type Database = {
           kind?: string;
           question_text?: string;
           context?: string | null;
+          discussion_path?: string | null;
           options?: Json;
           think?: Json;
           twist?: string | null;

@@ -8,6 +8,11 @@ export function questionDiscussionUrl(slug: string): string {
   return `${SOHS_WEBSITE_ORIGIN}/questions/${encodeURIComponent(slug)}/`;
 }
 
+export function discussionPathUrl(path: string): string | null {
+  if (!/^\/(questions|dilemmas)\/[a-z0-9-]+\/$/.test(path)) return null;
+  return `${SOHS_WEBSITE_ORIGIN}${path}`;
+}
+
 export async function openDiscussion(url: string): Promise<void> {
   try {
     await Browser.open({ url });

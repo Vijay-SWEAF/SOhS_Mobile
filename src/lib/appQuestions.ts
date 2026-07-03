@@ -1,5 +1,5 @@
 import type { Database, Json } from "./database.types";
-import { questionDiscussionUrl } from "./discussionBridge";
+import { discussionPathUrl, questionDiscussionUrl } from "./discussionBridge";
 import type { CountryChip, DailyQuestion, OptionIndex, QuestionOption, ThinkContent } from "./questions";
 import { supabase } from "./supabase";
 
@@ -110,6 +110,8 @@ function buildChips(
 
 function discussionUrlForRow(row: AppDailyQuestionWithLink): string | null {
   if (row.discussionUrl !== undefined) return row.discussionUrl;
+  const pathUrl = row.discussion_path ? discussionPathUrl(row.discussion_path) : null;
+  if (pathUrl) return pathUrl;
   if (!row.linked_question || row.linked_question.status !== "published") return null;
 
   return questionDiscussionUrl(row.linked_question.slug);
@@ -227,6 +229,7 @@ export async function castVote(
         question_id: question.questionId,
         active_date: question.activeDate,
         discussionUrl: question.discussionUrl,
+        discussion_path: null,
         day_number: question.day,
         kind: question.kind,
         question_text: question.text,
