@@ -2,6 +2,7 @@ import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react"
 import BrandBar from "../components/BrandBar";
 import ThinkPanel from "../components/ThinkPanel";
 import ShareCardOverlay from "../components/ShareCardOverlay";
+import SiteFooterLinks from "../components/SiteFooterLinks";
 import { fmt, type OptionIndex } from "../lib/questions";
 import { revealHaptic, tapHaptic } from "../lib/haptics";
 import { useReducedMotion } from "../lib/useReducedMotion";
@@ -522,6 +523,8 @@ export default function DailyQuestionScreen() {
             onClose={() => setShareOpen(false)}
           />
         )}
+
+        <SiteFooterLinks />
       </div>
     </div>
   );
