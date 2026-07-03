@@ -26,12 +26,12 @@ export default function ShareCardOverlay({ onClose, ...cardProps }: ShareCardOve
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-7"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 overflow-y-auto px-7 py-8"
       style={{ background: "rgba(6,9,18,0.88)", backdropFilter: "blur(6px)", animation: "fadeIn .25s ease both" }}
       onClick={onClose}
     >
       <ShareCard {...cardProps} />
-      <div className="absolute bottom-8 flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-3" onClick={(event) => event.stopPropagation()}>
         {error && (
           <span style={{ color: MUTED, fontSize: 12.5, maxWidth: 280, textAlign: "center" }}>{error}</span>
         )}

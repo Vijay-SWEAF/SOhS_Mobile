@@ -2,7 +2,8 @@ import { Directory, Filesystem } from "@capacitor/filesystem";
 import { Capacitor } from "@capacitor/core";
 import { Share } from "@capacitor/share";
 import type { DailyQuestion, OptionIndex } from "./questions";
-import { FAINT, GOLD, INK, INK_2, MUTED, PAPER, TEAL } from "./theme";
+import { FAINT, GOLD, HAIRLINE, INK, INK_2, MUTED, PAPER, TEAL } from "./theme";
+import { getShareBadge } from "./shareBadge";
 
 interface ShareExportOptions {
   question: DailyQuestion;
@@ -125,10 +126,40 @@ export async function renderSharePngDataUrl({
   let y = drawWrappedText(ctx, question.text, PAD, 220, WIDTH - PAD * 2, 78);
 
   const chosen = question.options[choice];
+  const badge = getShareBadge(chosen.pct, isMajority);
+  const badgeY = Math.max(y + 90, 560);
+  const badgeHeight = 190;
+  roundedRect(ctx, PAD, badgeY, WIDTH - PAD * 2, badgeHeight, 24);
+  ctx.fillStyle = "rgba(255,255,255,0.035)";
+  ctx.fill();
+  ctx.strokeStyle = HAIRLINE;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.fillStyle = accent;
+  ctx.font = "700 24px Inter, system-ui, sans-serif";
+  ctx.letterSpacing = "6px";
+  ctx.fillText(badge.eyebrow, PAD + 34, badgeY + 52);
+  ctx.letterSpacing = "0px";
+
+  ctx.fillStyle = MUTED;
+  ctx.font = "700 25px Inter, system-ui, sans-serif";
+  ctx.textAlign = "right";
+  ctx.fillText(chosen.label.toUpperCase(), WIDTH - PAD - 34, badgeY + 52);
+  ctx.textAlign = "left";
+
+  ctx.fillStyle = PAPER;
+  ctx.font = "400 46px Fraunces, Georgia, serif";
+  ctx.fillText(badge.title, PAD + 34, badgeY + 118);
+
+  ctx.fillStyle = MUTED;
+  ctx.font = "500 29px Inter, system-ui, sans-serif";
+  ctx.fillText(badge.detail, PAD + 34, badgeY + 160);
+
   const shareLine = isMajority ? `With the ${chosen.pct}%.` : `The rarer ${chosen.pct}%.`;
   ctx.fillStyle = accent;
   ctx.font = "500 92px Fraunces, Georgia, serif";
-  y = Math.max(y + 180, 820);
+  y = Math.max(badgeY + badgeHeight + 110, 820);
   drawWrappedText(ctx, shareLine, PAD, y, WIDTH - PAD * 2, 100);
 
   const barY = 1080;

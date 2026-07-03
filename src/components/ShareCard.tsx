@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
-import { FAINT, FONT_SERIF, GOLD, INK, INK_2, MUTED, PAPER } from "../lib/theme";
+import { FAINT, FONT_SERIF, GOLD, HAIRLINE, INK, INK_2, MUTED, PAPER } from "../lib/theme";
 import type { DailyQuestion, OptionIndex } from "../lib/questions";
+import { getShareBadge } from "../lib/shareBadge";
 
 /* The story-ready 4:5 result card shown before exporting a generated PNG. */
 
@@ -16,6 +17,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(function ShareCard(
   ref,
 ) {
   const chosen = question.options[choice];
+  const badge = getShareBadge(chosen.pct, isMajority);
   return (
     <div
       ref={ref}
@@ -36,6 +38,28 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(function ShareCard(
       <p className="mt-5" style={{ fontFamily: FONT_SERIF, fontSize: 21, lineHeight: 1.32, color: PAPER }}>
         {question.text}
       </p>
+      <div
+        className="mt-7 px-4 py-3"
+        style={{
+          borderRadius: 10,
+          border: `1px solid ${HAIRLINE}`,
+          background: "rgba(255,255,255,0.035)",
+          boxShadow: `inset 0 0 0 1px ${accent}12`,
+        }}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <span style={{ fontSize: 8.5, letterSpacing: "0.22em", color: accent, fontWeight: 700 }}>
+            {badge.eyebrow}
+          </span>
+          <span style={{ fontSize: 9.5, color: MUTED, fontWeight: 700 }}>{chosen.label.toUpperCase()}</span>
+        </div>
+        <p className="mt-2" style={{ fontFamily: FONT_SERIF, color: PAPER, fontSize: 18, lineHeight: 1.2 }}>
+          {badge.title}
+        </p>
+        <p className="mt-1.5" style={{ color: MUTED, fontSize: 10.5, lineHeight: 1.35 }}>
+          {badge.detail}
+        </p>
+      </div>
       <p
         className="mt-auto"
         style={{ fontFamily: FONT_SERIF, fontSize: 34, lineHeight: 1.1, color: accent, fontWeight: 500 }}
