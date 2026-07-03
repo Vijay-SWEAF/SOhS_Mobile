@@ -2,8 +2,7 @@ import { forwardRef } from "react";
 import { FAINT, FONT_SERIF, GOLD, INK, INK_2, MUTED, PAPER } from "../lib/theme";
 import type { DailyQuestion, OptionIndex } from "../lib/questions";
 
-/* The story-ready 4:5 result card. Kept as its own component (with a
-   forwarded ref) so Phase 5 can rasterize exactly this node to PNG. */
+/* The story-ready 4:5 result card shown before exporting a generated PNG. */
 
 export interface ShareCardProps {
   question: DailyQuestion;
