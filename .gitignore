@@ -6,6 +6,9 @@ dist/
 supabase/.temp/
 backup_before_*.sql
 
+# Local source/drop folder for app icon artwork; generated Android resources are committed
+icons/
+
 # Android build artifacts (project files in android/ are committed)
 android/app/build/
 android/build/
