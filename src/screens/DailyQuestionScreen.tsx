@@ -3,6 +3,7 @@ import BrandBar from "../components/BrandBar";
 import ThinkPanel from "../components/ThinkPanel";
 import ShareCardOverlay from "../components/ShareCardOverlay";
 import SiteFooterLinks from "../components/SiteFooterLinks";
+import DailyWordPuzzle from "../components/DailyWordPuzzle";
 import { fmt, type OptionIndex } from "../lib/questions";
 import { revealHaptic, tapHaptic } from "../lib/haptics";
 import { useReducedMotion } from "../lib/useReducedMotion";
@@ -509,6 +510,7 @@ export default function DailyQuestionScreen() {
                     Next question unlocks tomorrow
                   </div>
                 </div>
+                <DailyWordPuzzle question={q} />
               </div>
             )}
           </div>

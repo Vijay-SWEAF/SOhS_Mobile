@@ -12,6 +12,7 @@ This checklist is based on the current SOhS Mobile codebase and Google Play's Da
 - Current Android permissions: `INTERNET`, `POST_NOTIFICATIONS`
 - No mobile login, account creation, ads, server push notifications, camera, microphone, contacts, precise location, payment, or analytics SDK.
 - The app can request notification permission after the second launch to schedule a local daily reminder at 9:00 AM device time. This is not a server push service and does not collect additional user data.
+- The daily word puzzle is generated in-app from the active question and saves completion progress locally on the device only. It does not send puzzle progress or scores to the backend.
 - Public policy links exposed in-app:
   - Privacy: `https://www.societyofhomosapiens.org/privacy/`
   - Terms: `https://www.societyofhomosapiens.org/terms/`
