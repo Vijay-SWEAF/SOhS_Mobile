@@ -17,7 +17,7 @@ This checklist is based on the current SOhS Mobile codebase and Google Play's Da
   - About: `https://www.societyofhomosapiens.org/about/`
   - Support: `https://www.societyofhomosapiens.org/support/`
   - Corrections: `https://www.societyofhomosapiens.org/correction-policy/`
-- Direct support email exposed in-app: `developer@sweaf.biz`
+- Direct support email exposed in-app: `sohs@societyofhomosapiens.org`
 - Release AAB path after Phase 10A: `android/app/build/outputs/bundle/release/app-release.aab`
 
 ## Google Play Setup
@@ -35,8 +35,8 @@ Before production rollout, confirm the web privacy policy explicitly covers the 
 - Anonymous mobile voting.
 - Anonymous app/device UUID used to prevent duplicate votes.
 - Country-level signal inferred from locale/timezone when available.
-- Supabase as backend service provider.
-- User support/deletion requests through `developer@sweaf.biz`.
+- Backend/database service provider.
+- User support/deletion requests through `sohs@societyofhomosapiens.org`.
 
 ### App Access
 
@@ -96,7 +96,7 @@ Question: Is all user data collected by the app encrypted in transit?
 Yes
 ```
 
-Reason: Supabase and SOhS website calls use HTTPS/WSS.
+Reason: Backend and SOhS website calls use HTTPS/WSS.
 
 Question: Do you provide a way for users to request data deletion?
 
@@ -107,7 +107,7 @@ Yes
 Mechanism:
 
 ```text
-developer@sweaf.biz
+sohs@societyofhomosapiens.org
 ```
 
 Operational note: App votes are anonymous and tied to an app-generated UUID. If a user requests deletion, they may need to provide enough context to locate the relevant anonymous vote record. If you are not ready to process deletion requests operationally, answer `No` until a process is ready.
@@ -125,7 +125,7 @@ Device or other IDs
 Why:
 
 - The app generates and stores an anonymous UUID in Capacitor Preferences.
-- The UUID is sent to Supabase `cast_vote()` to prevent duplicate votes per question.
+- The UUID is sent to the backend vote function to prevent duplicate votes per question.
 - This is not the Android advertising ID, IMEI, MAC address, or hardware identifier.
 
 Collection:
@@ -140,7 +140,7 @@ Sharing:
 Not shared
 ```
 
-Reason: Supabase is acting as a service provider/backend for SOhS. No advertising/third-party profiling use is present.
+Reason: The backend provider acts as a service provider for SOhS. No advertising or third-party profiling use is present.
 
 Processed ephemerally:
 
@@ -230,7 +230,7 @@ App activity > Other actions
 
 Why:
 
-- A user's selected answer option is sent to Supabase when they vote.
+- A user's selected answer option is sent to the backend when they vote.
 - The data is used to produce aggregate vote percentages and duplicate-vote protection.
 
 Do not select `App interactions` unless the app later starts collecting general taps/page visits. The current app does not send page views, session counts, or generic interaction analytics.
@@ -305,7 +305,7 @@ Notes:
 
 ## Third-Party Services And SDKs
 
-### Supabase
+### Backend Database Service
 
 Used for:
 
@@ -348,7 +348,7 @@ SOhS Mobile gives you one daily civic or moral question. Vote anonymously, revea
 
 The app has no login, no ads, and no follower system. It is built for clear thinking, respectful disagreement, and daily reflection.
 
-Support and feedback: developer@sweaf.biz
+Support and feedback: sohs@societyofhomosapiens.org
 ```
 
 ## Release Checklist Before Upload
@@ -357,7 +357,7 @@ Support and feedback: developer@sweaf.biz
 - [x] Release signing is configured without committing keystore secrets.
 - [x] Signed release AAB can be built.
 - [x] Android manifest requests only `INTERNET`.
-- [ ] Confirm web support page visibly lists `developer@sweaf.biz`.
+- [ ] Confirm web support page visibly lists `sohs@societyofhomosapiens.org`.
 - [ ] Confirm web privacy policy includes mobile app voting data.
 - [ ] Upload `android/app/build/outputs/bundle/release/app-release.aab` to an internal testing track.
 - [ ] Complete Play Console App content forms:

@@ -1,7 +1,7 @@
 import { openWebsiteUrl, websitePageUrl } from "../lib/discussionBridge";
 import { GOLD, HAIRLINE, PAPER, RAISED } from "../lib/theme";
 
-const SUPPORT_EMAIL = "developer@sweaf.biz";
+const SUPPORT_EMAIL = "sohs@societyofhomosapiens.org";
 
 const links = [
   { label: "About", path: "/about/" },
