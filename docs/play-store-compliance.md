@@ -6,7 +6,7 @@ This checklist is based on the current SOhS Mobile codebase and Google Play's Da
 
 ## Current App Facts
 
-- Package name: `org.sweaf.sohs`
+- Package name: `biz.sweaf.sohs`
 - App name: `SOhS`
 - Current release version: `versionCode 1`, `versionName "1.0"`
 - Current Android permissions: `INTERNET` only

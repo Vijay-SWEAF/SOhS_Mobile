@@ -1,4 +1,4 @@
-package org.sweaf.sohs;
+package biz.sweaf.sohs;
 
 import com.getcapacitor.BridgeActivity;
 

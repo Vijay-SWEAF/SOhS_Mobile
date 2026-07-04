@@ -1,7 +1,7 @@
 #!/bin/zsh
 set -euo pipefail
 
-APP_ID="${SOHS_ANDROID_APP_ID:-org.sweaf.sohs}"
+APP_ID="${SOHS_ANDROID_APP_ID:-biz.sweaf.sohs}"
 
 echo "Connected devices:"
 adb devices

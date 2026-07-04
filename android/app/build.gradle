@@ -9,10 +9,10 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "org.sweaf.sohs"
+    namespace "biz.sweaf.sohs"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "org.sweaf.sohs"
+        applicationId "biz.sweaf.sohs"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

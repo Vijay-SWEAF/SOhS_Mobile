@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "org.sweaf.sohs",
+  appId: "biz.sweaf.sohs",
   appName: "SOhS",
   webDir: "dist",
   backgroundColor: "#0B1020",
