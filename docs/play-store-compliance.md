@@ -8,7 +8,7 @@ This checklist is based on the current SOhS Mobile codebase and Google Play's Da
 
 - Package name: `biz.sweaf.sohs`
 - App name: `SOhS`
-- Current release version: `versionCode 1`, `versionName "1.0"`
+- Current release version: `versionCode 2`, `versionName "1.0"`
 - Current Android permissions: `INTERNET` only
 - No mobile login, account creation, ads, push notifications, camera, microphone, contacts, precise location, payment, or analytics SDK.
 - Public policy links exposed in-app:
