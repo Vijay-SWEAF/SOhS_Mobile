@@ -2,6 +2,7 @@ import { forwardRef } from "react";
 import { FAINT, FONT_SERIF, GOLD, HAIRLINE, INK, INK_2, MUTED, PAPER } from "../lib/theme";
 import type { DailyQuestion, OptionIndex } from "../lib/questions";
 import { getShareBadge } from "../lib/shareBadge";
+import sohsAppIconUrl from "../assets/sohs-app-icon.png";
 
 /* The story-ready 4:5 result card shown before exporting a generated PNG. */
 
@@ -73,8 +74,16 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(function ShareCard(
         <div style={{ width: `${question.options[0].pct}%`, background: choice === 0 ? accent : "#2C3550" }} />
         <div style={{ flex: 1, background: choice === 1 ? accent : "#2C3550" }} />
       </div>
-      <div className="flex items-center justify-between mt-4">
-        <span style={{ fontSize: 10.5, color: FAINT }}>Think clearly. Discuss respectfully.</span>
+      <div className="flex items-center justify-between gap-3 mt-4">
+        <span className="flex min-w-0 items-center gap-2" style={{ fontSize: 10.5, color: FAINT, fontWeight: 700 }}>
+          <img
+            src={sohsAppIconUrl}
+            alt=""
+            className="shrink-0 rounded-full"
+            style={{ width: 26, height: 26, border: `1px solid ${GOLD}55` }}
+          />
+          <span>SOhS</span>
+        </span>
         <span style={{ fontSize: 10.5, color: MUTED, fontWeight: 600 }}>societyofhomosapiens.org</span>
       </div>
     </div>

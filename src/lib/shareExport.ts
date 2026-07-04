@@ -4,6 +4,7 @@ import { Share } from "@capacitor/share";
 import type { DailyQuestion, OptionIndex } from "./questions";
 import { FAINT, GOLD, HAIRLINE, INK, INK_2, MUTED, PAPER, TEAL } from "./theme";
 import { getShareBadge } from "./shareBadge";
+import sohsAppIconUrl from "../assets/sohs-app-icon.png";
 
 interface ShareExportOptions {
   question: DailyQuestion;
@@ -84,13 +85,43 @@ function downloadDataUrl(dataUrl: string, fileName: string): void {
   link.remove();
 }
 
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Unable to load share image asset."));
+    image.src = src;
+  });
+}
+
+function drawRoundImage(
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  size: number,
+): void {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.drawImage(image, x, y, size, size);
+  ctx.restore();
+
+  ctx.beginPath();
+  ctx.arc(x + size / 2, y + size / 2, size / 2 - 1, 0, Math.PI * 2);
+  ctx.strokeStyle = `${GOLD}88`;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
 export async function renderSharePngDataUrl({
   question,
   choice,
   accent,
   isMajority,
 }: ShareExportOptions): Promise<string> {
-  await document.fonts.ready;
+  const [appIcon] = await Promise.all([loadImage(sohsAppIconUrl), document.fonts.ready]);
 
   const canvas = document.createElement("canvas");
   canvas.width = WIDTH;
@@ -177,12 +208,14 @@ export async function renderSharePngDataUrl({
   ctx.fillRect(PAD + option0Width, barY, WIDTH - PAD * 2 - option0Width, 24);
   ctx.restore();
 
+  drawRoundImage(ctx, appIcon, PAD, 1186, 58);
+
   ctx.fillStyle = FAINT;
   ctx.font = "500 28px Inter, system-ui, sans-serif";
-  ctx.fillText("Think clearly. Discuss respectfully.", PAD, 1210);
+  ctx.fillText("Think clearly. Discuss respectfully.", PAD + 78, 1210);
   ctx.fillStyle = MUTED;
   ctx.font = "700 28px Inter, system-ui, sans-serif";
-  ctx.fillText("societyofhomosapiens.org", PAD, 1262);
+  ctx.fillText("societyofhomosapiens.org", PAD + 78, 1262);
 
   ctx.fillStyle = choice === 0 ? GOLD : TEAL;
   ctx.font = "700 30px Inter, system-ui, sans-serif";
