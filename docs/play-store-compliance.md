@@ -8,9 +8,10 @@ This checklist is based on the current SOhS Mobile codebase and Google Play's Da
 
 - Package name: `biz.sweaf.sohs`
 - App name: `SOhS`
-- Current release version: `versionCode 2`, `versionName "1.0"`
-- Current Android permissions: `INTERNET` only
-- No mobile login, account creation, ads, push notifications, camera, microphone, contacts, precise location, payment, or analytics SDK.
+- Current release version: `versionCode 3`, `versionName "1.0.1"`
+- Current Android permissions: `INTERNET`, `POST_NOTIFICATIONS`
+- No mobile login, account creation, ads, server push notifications, camera, microphone, contacts, precise location, payment, or analytics SDK.
+- The app can request notification permission after the second launch to schedule a local daily reminder at 9:00 AM device time. This is not a server push service and does not collect additional user data.
 - Public policy links exposed in-app:
   - Privacy: `https://www.societyofhomosapiens.org/privacy/`
   - Terms: `https://www.societyofhomosapiens.org/terms/`
@@ -330,8 +331,9 @@ Used plugins:
 - `@capacitor/filesystem`: writes generated share PNG to app cache.
 - `@capacitor/share`: opens native share sheet for user-initiated sharing.
 - `@capacitor/haptics`: tap/reveal feedback only.
+- `@capacitor/local-notifications`: schedules an optional local daily reminder after the user allows notifications.
 
-No permissions beyond `INTERNET` are requested by the app manifest.
+The app manifest requests `INTERNET` for backend/website access and `POST_NOTIFICATIONS` for the optional local daily reminder on Android 13+.
 
 ## Store Listing Copy Draft
 
@@ -356,7 +358,7 @@ Support and feedback: sohs@societyofhomosapiens.org
 - [x] Privacy/Terms/Support links are visible in the mobile app.
 - [x] Release signing is configured without committing keystore secrets.
 - [x] Signed release AAB can be built.
-- [x] Android manifest requests only `INTERNET`.
+- [x] Android manifest requests only `INTERNET` and `POST_NOTIFICATIONS`.
 - [ ] Confirm web support page visibly lists `sohs@societyofhomosapiens.org`.
 - [ ] Confirm web privacy policy includes mobile app voting data.
 - [ ] Upload `android/app/build/outputs/bundle/release/app-release.aab` to an internal testing track.
