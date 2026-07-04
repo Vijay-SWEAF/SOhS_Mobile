@@ -4,7 +4,14 @@ const SOHS_WEBSITE_ORIGIN = (
   (import.meta.env.VITE_SOHS_WEBSITE_ORIGIN as string | undefined) ?? "https://www.societyofhomosapiens.org"
 ).replace(/\/+$/, "");
 
-const STATIC_SITE_PATHS = new Set(["/about/", "/privacy/", "/terms/", "/support/", "/correction-policy/"]);
+const STATIC_SITE_PATHS = new Set([
+  "/about/",
+  "/privacy/",
+  "/terms/",
+  "/support/",
+  "/correction-policy/",
+  "/questions/",
+]);
 
 export function questionDiscussionUrl(slug: string): string {
   return `${SOHS_WEBSITE_ORIGIN}/questions/${encodeURIComponent(slug)}/`;

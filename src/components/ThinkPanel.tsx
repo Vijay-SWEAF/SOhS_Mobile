@@ -1,6 +1,6 @@
 import { GOLD, HAIRLINE, MUTED, PAPER, TEAL } from "../lib/theme";
 import type { ThinkContent } from "../lib/questions";
-import { openDiscussion } from "../lib/discussionBridge";
+import { openDiscussion, websitePageUrl } from "../lib/discussionBridge";
 
 /* Signature panel: "How to think about this" — fact / opinion / watch-for. */
 
@@ -30,9 +30,12 @@ interface ThinkPanelProps {
 }
 
 export default function ThinkPanel({ think, discussionUrl }: ThinkPanelProps) {
+  const fallbackDiscussionUrl = websitePageUrl("/questions/");
+  const targetUrl = discussionUrl ?? fallbackDiscussionUrl;
+
   const openLinkedDiscussion = (): void => {
-    if (!discussionUrl) return;
-    void openDiscussion(discussionUrl);
+    if (!targetUrl) return;
+    void openDiscussion(targetUrl);
   };
 
   return (
@@ -60,14 +63,15 @@ export default function ThinkPanel({ think, discussionUrl }: ThinkPanelProps) {
         className="px-5 py-3.5"
         style={{ borderTop: `1px solid ${HAIRLINE}`, background: "rgba(255,255,255,0.02)" }}
       >
-        {discussionUrl ? (
+        {targetUrl ? (
           <button
             type="button"
             onClick={openLinkedDiscussion}
             className="w-full text-left"
             style={{ fontSize: 12, color: MUTED }}
           >
-            Read the full discussion on <span style={{ color: GOLD, fontWeight: 500 }}>SOhS →</span>
+            {discussionUrl ? "Read the full discussion on " : "Explore SOhS discussions "}
+            <span style={{ color: GOLD, fontWeight: 500 }}>SOhS →</span>
           </button>
         ) : (
           <span style={{ fontSize: 12, color: MUTED }}>
