@@ -92,20 +92,16 @@ function compactVoteCount(count: number): string {
   return `${Math.floor(count / 100) * 100}+`;
 }
 
-function countryChipLine(labels: readonly [string, string], count0: number, count1: number): string {
+function countryChipLine(count0: number, count1: number): string {
   const total = count0 + count1;
   if (total === 1) {
-    const votedOption = count0 > 0 ? 0 : 1;
-    return `1 ${voteWord(total)} · ${labels[votedOption]}`;
+    return `${count0 > 0 ? "↑" : "↓"} 1 ${voteWord(total)}`;
   }
 
-  return `${compactVoteCount(count0)} ${labels[0]} · ${compactVoteCount(count1)} ${labels[1]}`;
+  return `↑ ${compactVoteCount(count0)} · ↓ ${compactVoteCount(count1)}`;
 }
 
-function buildChips(
-  labels: readonly [string, string],
-  countryRows: readonly AppCountryCountsRow[],
-): readonly CountryChip[] {
+function buildChips(countryRows: readonly AppCountryCountsRow[]): readonly CountryChip[] {
   return countryRows
     .map((row) => {
       const total = row.option0_count + row.option1_count;
@@ -115,7 +111,7 @@ function buildChips(
       return {
         flag: flagForCountry(code),
         name: countryName(code),
-        line: countryChipLine(labels, row.option0_count, row.option1_count),
+        line: countryChipLine(row.option0_count, row.option1_count),
         total,
       };
     })
@@ -150,7 +146,7 @@ function toQuestion(
     text: row.question_text,
     context: row.context ?? "",
     options: buildOptions(labels, counts),
-    chips: buildChips(labels, countryRows),
+    chips: buildChips(countryRows),
     twist: row.twist ?? "",
     think: parseThink(row.think),
     totalVotes: (counts?.option0_count ?? 0) + (counts?.option1_count ?? 0),

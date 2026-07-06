@@ -35,26 +35,26 @@ export default function BrandBar({ day }: BrandBarProps) {
             boxShadow: `0 0 14px ${GOLD}`,
           }}
         />
-        <span style={{ color: PAPER, fontSize: 13, fontWeight: 600, letterSpacing: "0.02em" }}>
-          Society Of <span style={{ color: GOLD }}>homo</span>Sapiens
-        </span>
-      </div>
-      <div className="flex flex-col items-end gap-1">
-        <span
-          className="px-2.5 py-1 rounded-full"
-          style={{ fontSize: 10, letterSpacing: "0.14em", color: MUTED, border: `1px solid ${HAIRLINE}` }}
-        >
-          DAY {day}
-        </span>
-        {versionLabel && (
-          <span
-            className="px-2 py-0.5 rounded-full"
-            style={{ fontSize: 9, letterSpacing: "0.08em", color: MUTED, border: `1px solid ${HAIRLINE}` }}
-          >
-            {versionLabel}
+        <div className="flex flex-col items-start gap-1">
+          <span style={{ color: PAPER, fontSize: 13, fontWeight: 600, letterSpacing: "0.02em" }}>
+            Society Of <span style={{ color: GOLD }}>homo</span>Sapiens
           </span>
-        )}
+          {versionLabel && (
+            <span
+              className="px-2 py-0.5 rounded-full"
+              style={{ fontSize: 9, letterSpacing: "0.08em", color: MUTED, border: `1px solid ${HAIRLINE}` }}
+            >
+              {versionLabel}
+            </span>
+          )}
+        </div>
       </div>
+      <span
+        className="px-2.5 py-1 rounded-full"
+        style={{ fontSize: 10, letterSpacing: "0.14em", color: MUTED, border: `1px solid ${HAIRLINE}` }}
+      >
+        DAY {day}
+      </span>
     </div>
   );
 }
