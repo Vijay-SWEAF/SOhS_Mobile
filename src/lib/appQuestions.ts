@@ -13,8 +13,6 @@ type AppDailyQuestionWithLink = AppDailyQuestionRow & {
   discussionUrl?: string | null;
 };
 
-const COUNTRY_PERCENTAGE_MIN_TOTAL = 5;
-
 export interface LiveDailyQuestion extends DailyQuestion {
   id: string;
   questionId: string | null;
@@ -89,15 +87,19 @@ function voteWord(total: number): string {
   return total === 1 ? "vote" : "votes";
 }
 
-function countryChipLine(
-  labels: readonly [string, string],
-  winner: OptionIndex,
-  winnerPct: number,
-  total: number,
-): string {
-  if (total === 1) return `1 vote · ${labels[winner]}`;
-  if (total < COUNTRY_PERCENTAGE_MIN_TOTAL) return `${total} votes · leaning ${labels[winner]}`;
-  return `${winnerPct}% ${labels[winner]} · ${total} ${voteWord(total)}`;
+function compactVoteCount(count: number): string {
+  if (count < 100) return `${count}`;
+  return `${Math.floor(count / 100) * 100}+`;
+}
+
+function countryChipLine(labels: readonly [string, string], count0: number, count1: number): string {
+  const total = count0 + count1;
+  if (total === 1) {
+    const votedOption = count0 > 0 ? 0 : 1;
+    return `1 ${voteWord(total)} · ${labels[votedOption]}`;
+  }
+
+  return `${compactVoteCount(count0)} ${labels[0]} · ${compactVoteCount(count1)} ${labels[1]}`;
 }
 
 function buildChips(
@@ -109,14 +111,11 @@ function buildChips(
       const total = row.option0_count + row.option1_count;
       if (total <= 0) return null;
 
-      const [pct0, pct1] = percentages(row.option0_count, row.option1_count);
-      const winner = pct0 >= pct1 ? 0 : 1;
-      const winnerPct = winner === 0 ? pct0 : pct1;
       const code = row.country_code.toUpperCase();
       return {
         flag: flagForCountry(code),
         name: countryName(code),
-        line: countryChipLine(labels, winner, winnerPct, total),
+        line: countryChipLine(labels, row.option0_count, row.option1_count),
         total,
       };
     })
