@@ -13,6 +13,8 @@ type AppDailyQuestionWithLink = AppDailyQuestionRow & {
   discussionUrl?: string | null;
 };
 
+const COUNTRY_PERCENTAGE_MIN_TOTAL = 5;
+
 export interface LiveDailyQuestion extends DailyQuestion {
   id: string;
   questionId: string | null;
@@ -83,6 +85,21 @@ function countryName(code: string): string {
   }
 }
 
+function voteWord(total: number): string {
+  return total === 1 ? "vote" : "votes";
+}
+
+function countryChipLine(
+  labels: readonly [string, string],
+  winner: OptionIndex,
+  winnerPct: number,
+  total: number,
+): string {
+  if (total === 1) return `1 vote · ${labels[winner]}`;
+  if (total < COUNTRY_PERCENTAGE_MIN_TOTAL) return `${total} votes · leaning ${labels[winner]}`;
+  return `${winnerPct}% ${labels[winner]} · ${total} ${voteWord(total)}`;
+}
+
 function buildChips(
   labels: readonly [string, string],
   countryRows: readonly AppCountryCountsRow[],
@@ -94,11 +111,12 @@ function buildChips(
 
       const [pct0, pct1] = percentages(row.option0_count, row.option1_count);
       const winner = pct0 >= pct1 ? 0 : 1;
+      const winnerPct = winner === 0 ? pct0 : pct1;
       const code = row.country_code.toUpperCase();
       return {
         flag: flagForCountry(code),
         name: countryName(code),
-        line: `${winner === 0 ? pct0 : pct1}% ${labels[winner]}`,
+        line: countryChipLine(labels, winner, winnerPct, total),
         total,
       };
     })

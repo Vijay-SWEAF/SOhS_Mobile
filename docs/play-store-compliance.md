@@ -8,11 +8,12 @@ This checklist is based on the current SOhS Mobile codebase and Google Play's Da
 
 - Package name: `biz.sweaf.sohs`
 - App name: `SOhS`
-- Current release version: `versionCode 3`, `versionName "1.0.1"`
+- Current release version: `versionCode 4`, `versionName "1.0.2"`
 - Current Android permissions: `INTERNET`, `POST_NOTIFICATIONS`
 - No mobile login, account creation, ads, server push notifications, camera, microphone, contacts, precise location, payment, or analytics SDK.
 - The app can request notification permission after the second launch to schedule a local daily reminder at 9:00 AM device time. This is not a server push service and does not collect additional user data.
 - The daily word puzzle is generated in-app from the active question and saves completion progress locally on the device only. It does not send puzzle progress or scores to the backend.
+- Country chips show vote counts for low-sample countries and only show percentages once a country has enough votes for the percentage to be meaningful.
 - Public policy links exposed in-app:
   - Privacy: `https://www.societyofhomosapiens.org/privacy/`
   - Terms: `https://www.societyofhomosapiens.org/terms/`
